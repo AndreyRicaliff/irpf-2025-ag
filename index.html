@@ -1106,40 +1106,49 @@ function renderAll(){
 }
 
 // ══════════════════════════════════════════════
-//  AUTH (Google OAuth + Supabase signInWithIdToken)
+//  AUTH (Google Sign-In + localStorage — padrão AG)
 // ══════════════════════════════════════════════
 const GOOGLE_CLIENT_ID='353720892078-14r0l8kpftkai4tg5q59ss4loinuria9.apps.googleusercontent.com';
 const ALLOWED_DOMAIN='agconsultorialtda.com';
+const SESSION_KEY='irpf_session';
+const SESSION_TTL_MS=12*60*60*1000; // 12h
 let appBooted=false;
-
-function showLoginError(msg){
-  const el=document.getElementById('loginError');
-  el.textContent=msg;el.classList.add('show');
-  document.getElementById('loginPending').style.display='none';
-  document.getElementById('googleBtn').style.display='flex';
-}
-function clearLoginError(){document.getElementById('loginError').classList.remove('show');}
 
 function parseJwt(token){
   const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
   return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
 }
 
-function showUserChip(user){
-  const meta=user.user_metadata||{};
-  const name=meta.full_name||meta.name||user.email||'';
-  const avatar=meta.avatar_url||meta.picture||'';
-  const initials=(name||'?').split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'?';
-  document.getElementById('userName').textContent=name.split(' ')[0]||user.email;
+function showLoginError(msg){
+  const el=document.getElementById('loginError');
+  el.textContent=msg;el.classList.add('show');
+}
+function clearLoginError(){document.getElementById('loginError').classList.remove('show');}
+
+function getSession(){
+  try{
+    const raw=localStorage.getItem(SESSION_KEY);if(!raw)return null;
+    const s=JSON.parse(raw);
+    if(!s?.email||!s.email.toLowerCase().endsWith('@'+ALLOWED_DOMAIN))return null;
+    if(s.exp&&Date.now()>s.exp)return null;
+    return s;
+  }catch(_){return null;}
+}
+function setSession(s){localStorage.setItem(SESSION_KEY,JSON.stringify(s));}
+function clearSession(){localStorage.removeItem(SESSION_KEY);}
+
+function showUserChip(s){
+  const initials=(s.name||s.email||'?').split(' ').filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join('')||'?';
+  document.getElementById('userName').textContent=(s.name||'').split(' ')[0]||s.email;
   const av=document.getElementById('userAvatar');
-  av.innerHTML=avatar?`<img src="${avatar}" alt="" referrerpolicy="no-referrer">`:initials;
+  av.innerHTML=s.picture?`<img src="${s.picture}" alt="" referrerpolicy="no-referrer">`:initials;
   document.getElementById('userChip').style.display='flex';
 }
 
-async function bootApp(user){
+async function bootApp(s){
   if(appBooted)return;appBooted=true;
   document.body.classList.remove('locked');
-  showUserChip(user);
+  showUserChip(s);
   await load();
   renderAll();
   subscribeRealtime();
@@ -1152,30 +1161,31 @@ function lockApp(){
   document.body.classList.add('locked');
   document.getElementById('userChip').style.display='none';
   clearLoginError();
-  document.getElementById('loginPending').style.display='none';
-  document.getElementById('googleBtn').style.display='flex';
 }
 
-async function onGoogleLogin(response){
+function onGoogleLogin(response){
   clearLoginError();
-  document.getElementById('googleBtn').style.display='none';
-  document.getElementById('loginPending').style.display='block';
-
-  const credential=response.credential;
   let payload;
-  try{payload=parseJwt(credential);}catch(e){return showLoginError('Token Google inválido.');}
+  try{payload=parseJwt(response.credential);}catch(e){return showLoginError('Token Google inválido.');}
 
   const email=(payload.email||'').toLowerCase();
   const hd=(payload.hd||'').toLowerCase();
-  if(hd!==ALLOWED_DOMAIN||!email.endsWith('@'+ALLOWED_DOMAIN)){
-    return showLoginError(`Acesso restrito a contas @${ALLOWED_DOMAIN}.`);
+  const verified=payload.email_verified===true||payload.email_verified==='true';
+
+  if(hd!==ALLOWED_DOMAIN||!email.endsWith('@'+ALLOWED_DOMAIN)||!verified){
+    return showLoginError(`Acesso negado. Apenas contas verificadas @${ALLOWED_DOMAIN}.`);
   }
 
-  const{data,error}=await sb.auth.signInWithIdToken({provider:'google',token:credential});
-  if(error){
-    return showLoginError(`Falha no login Supabase: ${error.message}. Verificar se o provedor Google está habilitado em Authentication → Providers.`);
-  }
-  bootApp(data.user);
+  const session={
+    email,
+    name:payload.name||email,
+    picture:payload.picture||'',
+    sub:payload.sub,
+    iat:Date.now(),
+    exp:Date.now()+SESSION_TTL_MS,
+  };
+  setSession(session);
+  bootApp(session);
 }
 
 function initGoogleSignIn(){
@@ -1185,33 +1195,27 @@ function initGoogleSignIn(){
     callback:onGoogleLogin,
     auto_select:false,
     hd:ALLOWED_DOMAIN,
+    use_fedcm_for_prompt:true,
   });
   google.accounts.id.renderButton(document.getElementById('googleBtn'),{
     theme:'filled_blue',size:'large',text:'signin_with',shape:'rectangular',width:280,locale:'pt-BR',
   });
 }
 
-document.getElementById('btnLogout').addEventListener('click',async()=>{
-  try{await sb.auth.signOut();}catch(e){}
+document.getElementById('btnLogout').addEventListener('click',()=>{
+  clearSession();
   if(window.google?.accounts?.id){google.accounts.id.disableAutoSelect();}
   lockApp();
+  initGoogleSignIn();
 });
 
-sb.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT'||!session){lockApp();}
-});
-
-(async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session?.user){
-    const email=(session.user.email||'').toLowerCase();
-    if(email.endsWith('@'+ALLOWED_DOMAIN)){return bootApp(session.user);}
-    await sb.auth.signOut();
-  }
-  const s=document.createElement('script');
-  s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;
-  s.onload=initGoogleSignIn;
-  document.head.appendChild(s);
+(()=>{
+  const s=getSession();
+  if(s){return bootApp(s);}
+  const tag=document.createElement('script');
+  tag.src='https://accounts.google.com/gsi/client';tag.async=true;tag.defer=true;
+  tag.onload=initGoogleSignIn;
+  document.head.appendChild(tag);
 })();
 </script>
 </body>
