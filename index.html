@@ -291,9 +291,62 @@ tr:hover td{background:rgba(165,94,255,.02);}
   .controls{flex-direction:column;align-items:stretch;}
   .controls-left{flex-direction:column;}
 }
+
+/* ── LOGIN ── */
+body.locked .header,body.locked .main{display:none!important;}
+.login-overlay{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(165,94,255,.18) 0%,transparent 70%),
+             radial-gradient(ellipse 60% 50% at 100% 100%,rgba(255,78,138,.12) 0%,transparent 70%),
+             radial-gradient(ellipse 60% 50% at 0% 100%,rgba(54,98,255,.10) 0%,transparent 70%),
+             #0E121A;}
+body.locked .login-overlay{display:flex;}
+.login-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(165,94,255,.25);border-radius:24px;padding:42px 36px;width:100%;max-width:440px;text-align:center;backdrop-filter:blur(10px);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);}
+.login-logo{display:inline-flex;align-items:center;gap:12px;margin-bottom:10px;}
+.login-logo-img{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#A55EFF,#FF4E8A);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#fff;letter-spacing:1px;}
+.login-brand{font-size:14px;font-weight:700;color:#fff;letter-spacing:2px;}
+.login-brand-sub{font-size:11px;color:#A55EFF;letter-spacing:3px;font-weight:600;margin-top:2px;}
+.login-title{font-size:22px;font-weight:800;color:#fff;margin:24px 0 6px;}
+.login-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:18px;}
+.login-domain{display:inline-block;font-size:11px;color:#D4AAFF;background:rgba(165,94,255,.15);border:1px solid rgba(165,94,255,.4);border-radius:8px;padding:5px 14px;margin-bottom:24px;letter-spacing:.4px;font-weight:600;}
+.login-btn-wrap{display:flex;justify-content:center;min-height:44px;}
+.login-error{display:none;font-size:12px;color:#ff8a7c;background:rgba(255,78,78,.10);border:1px solid rgba(255,78,78,.35);border-radius:10px;padding:10px 14px;margin-top:18px;line-height:1.5;text-align:left;}
+.login-error.show{display:block;}
+.login-foot{font-size:10px;color:rgba(255,255,255,.25);margin-top:24px;letter-spacing:.5px;}
+.login-spinner{width:36px;height:36px;border:3px solid rgba(165,94,255,.25);border-top-color:#A55EFF;border-radius:50%;animation:spin .8s linear infinite;margin:8px auto;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;background:var(--bg-soft);border:1.5px solid var(--border);border-radius:100px;}
+body.tv-mode .user-chip{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;overflow:hidden;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+.user-name{font-size:12px;font-weight:600;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+body.tv-mode .user-name{color:rgba(255,255,255,.85);}
+.btn-logout{background:transparent;border:none;cursor:pointer;font-size:14px;padding:4px 8px;border-radius:8px;color:var(--text-muted);transition:var(--tr);}
+.btn-logout:hover{background:var(--bg-soft);color:var(--rose);}
+body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
 </style>
 </head>
-<body>
+<body class="locked">
+
+<!-- ════ LOGIN OVERLAY ════ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-img">AG</div>
+      <div style="text-align:left;">
+        <div class="login-brand">AG CONSULTORIA</div>
+        <div class="login-brand-sub">IRPF 2025</div>
+      </div>
+    </div>
+    <div class="login-title">Controle de Declarações</div>
+    <div class="login-desc">Painel interno para acompanhamento das declarações de IRPF dos clientes da AG.<br>Acesso restrito ao domínio corporativo.</div>
+    <span class="login-domain">@agconsultorialtda.com</span>
+
+    <div class="login-btn-wrap" id="googleBtn"></div>
+    <div id="loginPending" style="display:none;"><div class="login-spinner"></div><div style="font-size:12px;color:rgba(255,255,255,.5);">Autenticando…</div></div>
+
+    <div class="login-error" id="loginError"></div>
+    <div class="login-foot">AG CONSULTORIA LTDA · uso interno</div>
+  </div>
+</div>
 
 <!-- ════ HEADER ════ -->
 <header class="header">
@@ -306,6 +359,11 @@ tr:hover td{background:rgba(165,94,255,.02);}
   <div class="header-right">
     <span id="lastSaved" style="font-size:11px;color:var(--text-muted);"></span>
     <span class="badge-irpf">IRPF 2025</span>
+    <div class="user-chip" id="userChip" style="display:none;">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <span class="user-name" id="userName"></span>
+      <button class="btn-logout" id="btnLogout" title="Sair">⏻</button>
+    </div>
   </div>
 </header>
 
@@ -1047,12 +1105,113 @@ function renderAll(){
   renderStats();renderDist();renderTable();renderCollabs();renderTvTeam();
 }
 
-(async()=>{
+// ══════════════════════════════════════════════
+//  AUTH (Google OAuth + Supabase signInWithIdToken)
+// ══════════════════════════════════════════════
+const GOOGLE_CLIENT_ID='353720892078-14r0l8kpftkai4tg5q59ss4loinuria9.apps.googleusercontent.com';
+const ALLOWED_DOMAIN='agconsultorialtda.com';
+let appBooted=false;
+
+function showLoginError(msg){
+  const el=document.getElementById('loginError');
+  el.textContent=msg;el.classList.add('show');
+  document.getElementById('loginPending').style.display='none';
+  document.getElementById('googleBtn').style.display='flex';
+}
+function clearLoginError(){document.getElementById('loginError').classList.remove('show');}
+
+function parseJwt(token){
+  const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+function showUserChip(user){
+  const meta=user.user_metadata||{};
+  const name=meta.full_name||meta.name||user.email||'';
+  const avatar=meta.avatar_url||meta.picture||'';
+  const initials=(name||'?').split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'?';
+  document.getElementById('userName').textContent=name.split(' ')[0]||user.email;
+  const av=document.getElementById('userAvatar');
+  av.innerHTML=avatar?`<img src="${avatar}" alt="" referrerpolicy="no-referrer">`:initials;
+  document.getElementById('userChip').style.display='flex';
+}
+
+async function bootApp(user){
+  if(appBooted)return;appBooted=true;
+  document.body.classList.remove('locked');
+  showUserChip(user);
   await load();
   renderAll();
   subscribeRealtime();
   updateCountdown();
   setInterval(updateCountdown,1000);
+}
+
+function lockApp(){
+  appBooted=false;
+  document.body.classList.add('locked');
+  document.getElementById('userChip').style.display='none';
+  clearLoginError();
+  document.getElementById('loginPending').style.display='none';
+  document.getElementById('googleBtn').style.display='flex';
+}
+
+async function onGoogleLogin(response){
+  clearLoginError();
+  document.getElementById('googleBtn').style.display='none';
+  document.getElementById('loginPending').style.display='block';
+
+  const credential=response.credential;
+  let payload;
+  try{payload=parseJwt(credential);}catch(e){return showLoginError('Token Google inválido.');}
+
+  const email=(payload.email||'').toLowerCase();
+  const hd=(payload.hd||'').toLowerCase();
+  if(hd!==ALLOWED_DOMAIN||!email.endsWith('@'+ALLOWED_DOMAIN)){
+    return showLoginError(`Acesso restrito a contas @${ALLOWED_DOMAIN}.`);
+  }
+
+  const{data,error}=await sb.auth.signInWithIdToken({provider:'google',token:credential});
+  if(error){
+    return showLoginError(`Falha no login Supabase: ${error.message}. Verificar se o provedor Google está habilitado em Authentication → Providers.`);
+  }
+  bootApp(data.user);
+}
+
+function initGoogleSignIn(){
+  if(!window.google?.accounts?.id){return setTimeout(initGoogleSignIn,200);}
+  google.accounts.id.initialize({
+    client_id:GOOGLE_CLIENT_ID,
+    callback:onGoogleLogin,
+    auto_select:false,
+    hd:ALLOWED_DOMAIN,
+  });
+  google.accounts.id.renderButton(document.getElementById('googleBtn'),{
+    theme:'filled_blue',size:'large',text:'signin_with',shape:'rectangular',width:280,locale:'pt-BR',
+  });
+}
+
+document.getElementById('btnLogout').addEventListener('click',async()=>{
+  try{await sb.auth.signOut();}catch(e){}
+  if(window.google?.accounts?.id){google.accounts.id.disableAutoSelect();}
+  lockApp();
+});
+
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'||!session){lockApp();}
+});
+
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    const email=(session.user.email||'').toLowerCase();
+    if(email.endsWith('@'+ALLOWED_DOMAIN)){return bootApp(session.user);}
+    await sb.auth.signOut();
+  }
+  const s=document.createElement('script');
+  s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;
+  s.onload=initGoogleSignIn;
+  document.head.appendChild(s);
 })();
 </script>
 </body>
