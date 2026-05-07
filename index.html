@@ -15,6 +15,26 @@
   --shadow:0 2px 16px rgba(165,94,255,.10);--shadow-card:0 8px 40px rgba(165,94,255,.18);
   --r:16px;--rs:10px;--rx:6px;--tr:.2s cubic-bezier(.4,0,.2,1);
 }
+body.dark{
+  --bg:#0E121A;--bg-soft:#161B26;--bg-table:#1A2030;
+  --border:#2A2F3D;--text:#E8E4F0;--text-muted:#8B82A0;
+  --purple-light:#3A2D5C;
+  --shadow:0 2px 16px rgba(0,0,0,.35);--shadow-card:0 8px 40px rgba(0,0,0,.45);
+}
+body.dark .header{background:#0E121A;border-color:#2A2F3D;}
+body.dark .stat-card,body.dark .dist-section,body.dark .colab-card,body.dark .modal,body.dark .diretrizes,body.dark .table-wrap{background:#161B26;}
+body.dark .modal-body{background:#161B26;}
+body.dark .modal-ft{background:#1A2030;border-color:#2A2F3D;}
+body.dark .finput,body.dark .ftextarea,body.dark .fselect,body.dark .search-box,body.dark .cselect,body.dark .date-in{background:#0E121A;color:var(--text);border-color:#2A2F3D;}
+body.dark th{background:#1A2030;color:#A09AB8;}
+body.dark tr:hover td{background:rgba(165,94,255,.05);}
+body.dark .tabs{background:#1A2030;}
+body.dark .tab-btn.active{background:#0E121A;}
+body.dark .editable[data-placeholder]:empty::before{color:#5A5072;}
+body.dark .toast{box-shadow:0 4px 24px rgba(0,0,0,.5);}
+body.dark .row-num{color:#5A5072;}
+body.dark .ag-flag{background:rgba(255,140,66,.15);color:#FFB88A;}
+body.dark .ag-warn{background:rgba(255,78,138,.18);color:#FF8FB0;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg-soft);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;transition:background .3s;}
 body.tv-mode{background:#0E121A;}
@@ -302,7 +322,8 @@ body.locked .header,body.locked .main{display:none!important;}
 body.locked .login-overlay{display:flex;}
 .login-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(165,94,255,.25);border-radius:24px;padding:42px 36px;width:100%;max-width:440px;text-align:center;backdrop-filter:blur(10px);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);}
 .login-logo{display:inline-flex;align-items:center;gap:12px;margin-bottom:10px;}
-.login-logo-img{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#A55EFF,#FF4E8A);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#fff;letter-spacing:1px;}
+.login-logo-img{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#A55EFF,#FF4E8A);align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#fff;letter-spacing:1px;}
+.login-logo-png{height:52px;width:auto;filter:brightness(0) invert(1);}
 .login-brand{font-size:14px;font-weight:700;color:#fff;letter-spacing:2px;}
 .login-brand-sub{font-size:11px;color:#A55EFF;letter-spacing:3px;font-weight:600;margin-top:2px;}
 .login-title{font-size:22px;font-weight:800;color:#fff;margin:24px 0 6px;}
@@ -322,6 +343,27 @@ body.tv-mode .user-name{color:rgba(255,255,255,.85);}
 .btn-logout{background:transparent;border:none;cursor:pointer;font-size:14px;padding:4px 8px;border-radius:8px;color:var(--text-muted);transition:var(--tr);}
 .btn-logout:hover{background:var(--bg-soft);color:var(--rose);}
 body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
+.btn-theme{background:var(--bg-soft);border:1.5px solid var(--border);cursor:pointer;font-size:15px;width:34px;height:34px;border-radius:10px;color:var(--text-muted);transition:var(--tr);display:inline-flex;align-items:center;justify-content:center;}
+.btn-theme:hover{border-color:var(--purple);color:var(--purple);transform:translateY(-1px);}
+body.tv-mode .btn-theme{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+
+/* ── AGING / FLAGS ── */
+.ag-flag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:rgba(255,140,66,.15);color:#A55400;margin-left:6px;letter-spacing:.3px;vertical-align:middle;}
+.ag-warn{background:rgba(255,78,138,.18);color:#B5294C;}
+.obs-inline{font-size:10.5px;color:var(--text-muted);font-style:italic;margin-top:3px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+th.sortable{cursor:pointer;user-select:none;position:relative;padding-right:18px;}
+th.sortable:hover{color:var(--purple);}
+th.sortable::after{content:'⇅';position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;opacity:.4;}
+th.sortable.asc::after{content:'▲';opacity:1;color:var(--purple);}
+th.sortable.desc::after{content:'▼';opacity:1;color:var(--purple);}
+
+/* ── CONTACT MODAL ── */
+.ct-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--border);font-size:13px;}
+.ct-row:last-of-type{border-bottom:none;}
+.ct-lbl{color:var(--text-muted);font-weight:500;flex-shrink:0;}
+.ct-val{color:var(--text);font-weight:600;text-align:right;word-break:break-word;}
+.ct-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+.ct-actions .btn{flex:1;min-width:110px;justify-content:center;text-decoration:none;}
 </style>
 </head>
 <body class="locked">
@@ -330,7 +372,10 @@ body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-img">AG</div>
+      <img src="https://agconsultorialtda.com/wp-content/uploads/2025/04/ag.png" alt="AG Consultoria"
+           class="login-logo-png"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="login-logo-img" style="display:none;">AG</div>
       <div style="text-align:left;">
         <div class="login-brand">AG CONSULTORIA</div>
         <div class="login-brand-sub">IRPF 2025</div>
@@ -359,6 +404,7 @@ body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
   <div class="header-right">
     <span id="lastSaved" style="font-size:11px;color:var(--text-muted);"></span>
     <span class="badge-irpf">IRPF 2025</span>
+    <button class="btn-theme" id="btnTheme" title="Alternar tema" aria-label="Alternar tema">🌙</button>
     <div class="user-chip" id="userChip" style="display:none;">
       <div class="user-avatar" id="userAvatar">?</div>
       <span class="user-name" id="userName"></span>
@@ -438,14 +484,14 @@ body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
           <thead>
             <tr>
               <th style="width:34px;">#</th>
-              <th>CNPJ / CPF</th>
-              <th>Nome Fantasia / Cliente</th>
-              <th>Sócios / Responsável</th>
+              <th class="sortable" data-sort="cnpj">CNPJ / CPF</th>
+              <th class="sortable" data-sort="nomeFantasia">Nome Fantasia / Cliente</th>
+              <th class="sortable" data-sort="socios">Sócios / Responsável</th>
               <th>CPF dos Sócios</th>
               <th>Senha OGV</th>
-              <th>Contador</th>
-              <th>Data Reunião</th>
-              <th>Status</th>
+              <th class="sortable" data-sort="contadorId">Contador</th>
+              <th class="sortable" data-sort="dataReuniao">Data Reunião</th>
+              <th class="sortable" data-sort="status">Status</th>
               <th style="width:90px;">Ações</th>
             </tr>
           </thead>
@@ -531,6 +577,15 @@ body.tv-mode .btn-logout:hover{background:rgba(255,255,255,.08);}
   </div>
 
 </main>
+
+<!-- ════ CONTATO MODAL ════ -->
+<div class="modal-overlay" id="contactOverlay" style="display:none;" onclick="if(event.target===this)closeContact()">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-hd"><div class="modal-title">📞 Contato do Cliente</div><div class="modal-sub">Ações rápidas e copiar info</div></div>
+    <div class="modal-body" id="contactBody"></div>
+    <div class="modal-ft"><button class="btn btn-outline" onclick="closeContact()">Fechar</button></div>
+  </div>
+</div>
 
 <!-- ════ MODAL ════ -->
 <div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
@@ -678,7 +733,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const FMAP={cnpj:'cnpj',nomeFantasia:'nome_fantasia',socios:'socios',cpf:'cpf',senhaOGV:'senha_ogv',contadorId:'contador_id',dataReuniao:'data_reuniao',status:'status',telefone:'telefone',email:'email',obs:'obs'};
 
 function toDb(c){return{id:c.id,cnpj:c.cnpj,nome_fantasia:c.nomeFantasia,socios:c.socios,cpf:c.cpf,senha_ogv:c.senhaOGV,contador_id:c.contadorId,data_reuniao:c.dataReuniao,status:c.status,telefone:c.telefone,email:c.email,obs:c.obs};}
-function fromDb(r){return{id:r.id,cnpj:r.cnpj||'',nomeFantasia:r.nome_fantasia||'',socios:r.socios||'',cpf:r.cpf||'',senhaOGV:r.senha_ogv||'',contadorId:r.contador_id||'',dataReuniao:r.data_reuniao||'',status:r.status||'aguardando',telefone:r.telefone||'',email:r.email||'',obs:r.obs||''};}
+function fromDb(r){return{id:r.id,cnpj:r.cnpj||'',nomeFantasia:r.nome_fantasia||'',socios:r.socios||'',cpf:r.cpf||'',senhaOGV:r.senha_ogv||'',contadorId:r.contador_id||'',dataReuniao:r.data_reuniao||'',status:r.status||'aguardando',telefone:r.telefone||'',email:r.email||'',obs:r.obs||'',createdAt:r.created_at||null};}
 
 // ══════════════════════════════════════════════
 //  STATE
@@ -686,6 +741,19 @@ function fromDb(r){return{id:r.id,cnpj:r.cnpj||'',nomeFantasia:r.nome_fantasia||
 let clients=[];
 let editingId=null;
 let pwdVisible={};
+let sortState={key:null,dir:'asc'};
+
+// ── Aging helpers
+function daysSince(iso){if(!iso)return null;const d=new Date(iso);return Math.floor((Date.now()-d.getTime())/86400000);}
+function agingChip(c){
+  if(c.status!=='aguardando')return '';
+  const d=daysSince(c.createdAt);
+  if(d===null||d<7)return '';
+  const cls=d>=21?'ag-flag ag-warn':'ag-flag';
+  const ic=d>=21?'🔴':'🟠';
+  return `<span class="${cls}" title="Cadastrado há ${d} dias sem contato">${ic} ${d}d</span>`;
+}
+function onlyDigits(s){return String(s||'').replace(/\D/g,'');}
 
 // ══════════════════════════════════════════════
 //  UTILS
@@ -806,10 +874,31 @@ function filtered(){
   const q=(document.getElementById('searchInput').value||'').toLowerCase();
   const fs=document.getElementById('filterStatus').value;
   const fc=document.getElementById('filterContador').value;
-  return clients.filter(c=>{
+  let list=clients.filter(c=>{
     const mq=!q||c.cnpj.toLowerCase().includes(q)||c.nomeFantasia.toLowerCase().includes(q)||c.socios.toLowerCase().includes(q)||c.cpf.toLowerCase().includes(q)||c.telefone.toLowerCase().includes(q);
     return mq&&(!fs||c.status===fs)&&(!fc||c.contadorId===fc);
   });
+  if(sortState.key){
+    const k=sortState.key,sgn=sortState.dir==='desc'?-1:1;
+    const idxFor=v=>k==='status'?STATUSES.findIndex(s=>s.id===v):k==='contadorId'?CONTADORES.findIndex(x=>x.id===v):null;
+    list=[...list].sort((a,b)=>{
+      let av=a[k],bv=b[k];
+      const ai=idxFor(av),bi=idxFor(bv);
+      if(ai!==null){return sgn*((ai===-1?999:ai)-(bi===-1?999:bi));}
+      av=(av||'').toString().toLowerCase();bv=(bv||'').toString().toLowerCase();
+      return sgn*(av<bv?-1:av>bv?1:0);
+    });
+  }
+  return list;
+}
+function setSort(key){
+  if(sortState.key===key){sortState.dir=sortState.dir==='asc'?'desc':'asc';}
+  else{sortState.key=key;sortState.dir='asc';}
+  document.querySelectorAll('th.sortable').forEach(t=>{
+    t.classList.remove('asc','desc');
+    if(t.dataset.sort===sortState.key)t.classList.add(sortState.dir);
+  });
+  renderTable();
 }
 
 function renderTable(){
@@ -829,10 +918,16 @@ function renderTable(){
           onblur="upd('${c.id}','cnpj',this.textContent.trim())"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
           style="font-family:monospace;font-size:11px;color:var(--text-muted);min-width:110px;">${esc(c.cnpj)}</div></td>
-      <td><div class="editable" contenteditable="true" data-placeholder="Sem nome — clique para editar"
-          onblur="upd('${c.id}','nomeFantasia',this.textContent.trim())"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-          style="font-weight:600;min-width:160px;">${esc(c.nomeFantasia)}</div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <div class="editable" contenteditable="true" data-placeholder="Sem nome — clique para editar"
+            onblur="upd('${c.id}','nomeFantasia',this.textContent.trim())"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+            style="font-weight:600;min-width:140px;">${esc(c.nomeFantasia)}</div>
+          ${agingChip(c)}
+        </div>
+        ${c.obs?`<div class="obs-inline" title="${esc(c.obs)}">📝 ${esc(c.obs)}</div>`:''}
+      </td>
       <td><div class="editable" contenteditable="true" data-placeholder="—"
           onblur="upd('${c.id}','socios',this.textContent.trim())"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
@@ -887,15 +982,27 @@ function cycleSt(id){
 }
 function contactInfo(id){
   const c=clients.find(x=>x.id===id);if(!c)return;
-  const nome=c.nomeFantasia||c.cnpj||'Cliente';
-  let msg=`📋 ${nome}\n`;
-  if(c.socios)msg+=`👤 Sócio(s): ${c.socios}\n`;
-  if(c.telefone)msg+=`📞 ${c.telefone}\n`;
-  if(c.email)msg+=`📧 ${c.email}\n`;
-  if(!c.telefone&&!c.email)msg+=`\n⚠️ Nenhum contato cadastrado.`;
-  if(c.obs)msg+=`\n📝 ${c.obs}`;
-  alert(msg);
+  const nome=c.nomeFantasia||c.socios||c.cnpj||'Cliente';
+  const ph=onlyDigits(c.telefone);
+  const wa=ph?(ph.length<=11?'55'+ph:ph):'';
+  const ctText=c.contadorId?(getCt(c.contadorId)?.nome||'—'):'—';
+  const greet=encodeURIComponent(`Olá ${(c.socios||'').split(',')[0].trim()||nome}, aqui é o time da AG Consultoria. Estamos entrando em contato sobre a sua declaração de IRPF 2025. 😊`);
+  document.getElementById('contactBody').innerHTML=`
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;">${esc(nome)}</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Contador: <b style="color:var(--purple);">${esc(ctText)}</b></div>
+    <div class="ct-row"><span class="ct-lbl">👤 Sócio(s)</span><span class="ct-val">${esc(c.socios||'—')}</span></div>
+    <div class="ct-row"><span class="ct-lbl">📞 Telefone</span><span class="ct-val">${esc(c.telefone||'—')}</span></div>
+    <div class="ct-row"><span class="ct-lbl">📧 Email</span><span class="ct-val">${esc(c.email||'—')}</span></div>
+    ${c.obs?`<div class="ct-row"><span class="ct-lbl">📝 Obs</span><span class="ct-val">${esc(c.obs)}</span></div>`:''}
+    <div class="ct-actions">
+      ${wa?`<a class="btn btn-primary" href="https://wa.me/${wa}?text=${greet}" target="_blank" rel="noopener">💬 WhatsApp</a>`:''}
+      ${c.telefone?`<a class="btn btn-outline" href="tel:${ph}">📞 Ligar</a>`:''}
+      ${c.email?`<a class="btn btn-outline" href="mailto:${esc(c.email)}?subject=${encodeURIComponent('IRPF 2025 — AG Consultoria')}">✉️ E-mail</a>`:''}
+      ${(!c.telefone&&!c.email)?'<div style="font-size:12px;color:var(--text-muted);">⚠️ Nenhum contato cadastrado.</div>':''}
+    </div>`;
+  document.getElementById('contactOverlay').style.display='flex';
 }
+function closeContact(){document.getElementById('contactOverlay').style.display='none';}
 async function del(id){
   const c=clients.find(x=>x.id===id);
   if(!confirm(`Remover "${c.nomeFantasia||c.socios||'este cliente'}"?`))return;
@@ -1149,6 +1256,7 @@ async function bootApp(s){
   if(appBooted)return;appBooted=true;
   document.body.classList.remove('locked');
   showUserChip(s);
+  document.querySelectorAll('th.sortable').forEach(t=>t.addEventListener('click',()=>setSort(t.dataset.sort)));
   await load();
   renderAll();
   subscribeRealtime();
@@ -1201,6 +1309,32 @@ function initGoogleSignIn(){
     theme:'filled_blue',size:'large',text:'signin_with',shape:'rectangular',width:280,locale:'pt-BR',
   });
 }
+
+// ── Theme (persistente)
+const THEME_KEY='irpf_theme';
+function applyTheme(t){
+  document.body.classList.toggle('dark',t==='dark');
+  document.getElementById('btnTheme').textContent=t==='dark'?'☀️':'🌙';
+  document.getElementById('btnTheme').title=t==='dark'?'Tema claro':'Tema escuro';
+}
+(function(){
+  const saved=localStorage.getItem(THEME_KEY);
+  const sysDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved||(sysDark?'dark':'light'));
+})();
+document.getElementById('btnTheme').addEventListener('click',()=>{
+  const next=document.body.classList.contains('dark')?'light':'dark';
+  localStorage.setItem(THEME_KEY,next);
+  applyTheme(next);
+});
+
+// ── ESC fecha modais
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('modalOverlay').style.display==='flex')closeModal();
+    else if(document.getElementById('contactOverlay').style.display==='flex')closeContact();
+  }
+});
 
 document.getElementById('btnLogout').addEventListener('click',()=>{
   clearSession();
